@@ -1,4 +1,4 @@
-version: '2.2'
+version: '3'
 services:
   es01:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.15.1
@@ -7,6 +7,9 @@ services:
       - node.name=es01
       - discovery.type=single-node
       - bootstrap.memory_lock=true
+      - ELASTIC_PASSWORD=$ELASTIC_PASSWORD
+      - "xpack.security.enabled=true"
+      - "xpack.security.authc.api_key.enabled=true"
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     ulimits:
       memlock:
@@ -19,14 +22,38 @@ services:
     networks:
       - elastic
 
+  ent-search:
+    image: docker.elastic.co/enterprise-search/enterprise-search:7.15.1
+    depends_on:
+      - "es01"
+    environment:
+      - "JAVA_OPTS=-Xms512m -Xmx512m"
+      - ENT_SEARCH_DEFAULT_PASSWORD=$ELASTIC_PASSWORD
+      - elasticsearch.username=$ELASTIC_USER
+      - elasticsearch.password=$ELASTIC_PASSWORD
+      - elasticsearch.host=http://es01:9200
+      - "allow_es_settings_modification=true"
+      - "secret_management.encryption_keys=[4a2cd3f81d39bf28738c10db0ca782095ffac07279561809eecc722e0c20eb09]"
+      - "elasticsearch.startup_retry.interval=15"
+    ports:
+      - 3002:3002
+    networks:
+      - elastic
+
   kib01:
     image: docker.elastic.co/kibana/kibana:7.15.1
     container_name: kib01
+    depends_on:
+      - "es01"
+      - "ent-search"
     ports:
       - 5601:5601
     environment:
-      ELASTICSEARCH_URL: http://es01:9200
-      ELASTICSEARCH_HOSTS: '["http://es01:9200"]'
+      - ELASTICSEARCH_URL=http://es01:9200
+      - ELASTICSEARCH_HOSTS=["http://es01:9200"]
+      - ELASTICSEARCH_USERNAME=$ELASTIC_USER
+      - ELASTICSEARCH_PASSWORD=$ELASTIC_PASSWORD
+      - ENTERPRISESEARCH_HOST=http://ent-search:3002
     networks:
       - elastic
 

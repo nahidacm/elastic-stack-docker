@@ -8,4 +8,8 @@ elastic stack on docker. elastic search with kibana and Elastic enterprise, Elat
 4. For Kibana UI visit http://localhost:5601
 5. For Elastic enterprise UI visit: http://localhost:3002
 6. Elastic search is runnig on port `9200`
-7. Credentials: user
+7. Credentials: 
+  user: `youruser`
+  pass: `yourpass`
+  
+You may update the login credentials on the `.env` file

@@ -2,7 +2,7 @@
 elastic stack on docker. elastic search with kibana and Elastic enterprise, Elatic app search.
 
 ## Installation:
-1. clone the repo
+1. clone the repo: `git clone git@github.com:nahidacm/elastic-stack-docker.git`
 2. cd to the directory
 3. Run `docker-compose up`
 4. For Kibana UI visit http://localhost:5601
